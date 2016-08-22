@@ -1,0 +1,115 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-styles/typography.html" />
+<link rel="import" href="../paper-checkbox/paper-checkbox.html" />
+<link rel="import" href="../paper-radio-button/paper-radio-button.html" />
+
+<!-- 
+  An element that can be either a checkbox or a radio button, with an optional key and content
+   ### Styling
+  The following custom properties and mixins are available for styling:
+  Custom property | Description | Default
+  ----------------|-------------|----------
+  `--choice-button-color` | the default color of the button | `--paper-indigo-500`
+  `--choice-button-text-color` | the default color of the button text | `--paper-indigo-500`
+  `--choice-button-correct-color` | the correct color of the button | `--paper-indigo-500`
+  `--choice-button-text-correct-color` | the correct color of the button text | `--paper-indigo-500`
+  `--choice-button-incorrect-color` | the incorrect color of the button | `--paper-indigo-500`
+  `--choice-button-text-incorrect-color` | the incorrect color of the button text | `--paper-indigo-500`
+  @demo demo/index.html
+-->
+
+<dom-module id="corespring-choice-button">
+  <template>
+    <style>
+      :host {
+        @apply(--paper-font-common-base);
+        --primary-color: var(--choice-button-color, --paper-indigo-500);
+        display: inline-block;
+      }
+
+      .incorrect {
+        --primary-color: var(--choice-button-incorrect-color, orange);
+        --primary-text-color: var(--choice-button-incorrect-text-color, orange);
+      }
+
+      .correct {
+        --primary-color: var(--choice-button-correct-color, green);
+        --primary-text-color: var(--choice-button-correct-text-color, green);
+      }
+
+      paper-radio-button{
+        vertical-align: top;
+        --paper-radio-button-checked-color: var(--choice-button-color, --paper-indigo-500);
+        --paper-radio-button-unchecked-color: var(--choice-button-color, --paper-indigo-500);
+        --paper-radio-button-label-color: var(--choice-button-text-color, --paper-indigo-500);
+      }
+
+      paper-radio-button.incorrect{
+        --paper-radio-button-checked-color: var(--choice-button-incorrect-color, --paper-orange-500);
+        --paper-radio-button-unchecked-color: var(--choice-button-incorrect-color, --paper-orange-500);
+        --paper-radio-button-label-color: var(--choice-button-text-incorrect-color, --paper-orange-500);
+      }
+
+      paper-radio-button.correct{
+        --paper-radio-button-checked-color: var(--choice-button-correct-color, --paper-green-500);
+        --paper-radio-button-unchecked-color: var(--choice-button-correct-color, --paper-green-500);
+        --paper-radio-button-label-color: var(--choice-button-text-correct-color, --paper-green-500);
+      }
+      paper-checkbox{
+        --paper-checkbox-checked-color: var(--choice-button-color, --paper-indigo-500);
+        --paper-checkbox-unchecked-color: var(--choice-button-color, --paper-indigo-500);
+        --paper-checkbox-label-color: var(--choice-button-text-color, --paper-indigo-500);
+      }
+
+      paper-checkbox.correct{
+        --paper-checkbox-checked-color: var(--choice-button-correct-color, --paper-green-500);
+        --paper-checkbox-unchecked-color: var(--choice-button-correct-color, --paper-green-500);
+        --paper-checkbox-label-color: var(--choice-button-text-correct-color, --paper-green-500);
+      }
+      paper-checkbox.incorrect{
+        --paper-checkbox-checked-color: var(--choice-button-incorrect-color, --paper-orange-500);
+        --paper-checkbox-unchecked-color: var(--choice-button-incorrect-color, --paper-orange-500);
+        --paper-checkbox-label-color: var(--choice-button-text-incorrect-color, --paper-orange-500);
+      }
+    </style>
+    <div>
+      <feedback-tick correctness="{{correctness}}"></feedback-tick>
+      <template is="dom-if" if="{{_equals('checkbox', mode)}}">
+        <paper-checkbox noink value="{{value}}" checked="{{selected}}" on-change="_onChange" class$="{{correctness}}" disabled="{{disabled}}"></paper-checkbox>
+      </template>
+      <template is="dom-if" if="{{_equals('radio', mode)}}">
+        <paper-radio-button noink value="{{value}}" checked="{{selected}}" on-change="_onChange" class$="{{correctness}}" disabled="{{disabled}}"></paper-radio-button>
+      </template>
+    </div>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: "corespring-choice-button",
+    properties: {
+      mode: {type:String},
+      key: {type:String},
+      label: {type:String},
+      value: {type:String},
+      correctness: {type:String, observer: '_onCorrectnessChange'},
+      disabled:{type:Boolean},
+      selected: {type:Boolean},
+      /**
+       * Fired when a button is checked/unchecked.
+       * Sends {value: .., selected: true|false}
+       * @event change
+       *
+       */
+    },
+    _onCorrectnessChange: function(){
+      this.updateStyles();
+    },
+    _equals: function(desired, actual){
+      return desired === actual;
+    },
+    _onChange: function(event){
+      event.stopImmediatePropagation();
+      this.fire('change', {value: this.value, selected: this.selected});
+    }
+  });
+</script>

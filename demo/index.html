@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+<head>
+  <script type="text/javascript" src="../../webcomponentsjs/webcomponents.js"></script>
+  <link rel="import" href="./choice-matrix-demo.html"/>
+  <script type="text/javascript" src="../../lodash/dist/lodash.js"></script>
+  <script>
+
+    function set(id, title, config, outcomes, response) {
+      var el = document.querySelector(id);
+      if (el) {
+        el.title = title;
+        el.config = config;
+        el.outcomes = outcomes;
+        el.response = response;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+      function base() {
+        return {
+          prompt: 'This is a prompt...',
+          choiceMode: 'radio',
+          keyMode: 'numbers',
+          disabled: false,
+          columns: [
+            'Column 1',
+            'Column 2',
+            'Column 3'
+          ],
+          rows: [
+            {
+              "id": "row-1",
+              "label": "Question text 1"
+            },
+            {
+              "id": "row-2",
+              "label": "Question text 2"
+            },
+            {
+              "id": "row-3",
+              "label": "Question text 3"
+            }
+          ]
+        }
+      };
+
+      var cbInitialResponse = [
+        {
+          id: 'row-1',
+          matchSet: [true, true, false]
+        },
+        {
+          id: 'row-2',
+          matchSet: [false, true, false]
+        },
+        {
+          id: 'row-3',
+          matchSet: [true, false, true]
+        }
+      ];
+
+      var radioInitialResponse = [
+        {
+          id: 'row-1',
+          matchSet: [true, false, false]
+        },
+        {
+          id: 'row-2',
+          matchSet: [false, true, false]
+        },
+        {
+          id: 'row-3',
+          matchSet: [false, false, true]
+        }
+      ];
+
+      var correctResponse = _.cloneDeep(cbInitialResponse);
+      correctResponse[0].matchSet = [true, false, false];
+      correctResponse[1].matchSet = [false, false, false];
+      correctResponse[2].matchSet = [true, false, true];
+
+      var cbOutcomes = [
+        {id: 'row-1', correctness: ['correct', 'incorrect', '']},
+        {id: 'row-2', correctness: ['', 'incorrect', '']},
+        {id: 'row-3', correctness: ['correct', '', 'correct']}
+      ];
+      var radioOutcomes = [
+        {id: 'row-1', correctness: ['correct', '', '']},
+        {id: 'row-2', correctness: ['', 'incorrect', '']},
+        {id: 'row-3', correctness: ['', '', 'correct']}
+      ];
+      set('#zero',
+        'A basic radio group...',
+        _.assign(base(), {}), [], radioInitialResponse);
+
+      set('#one',
+        'Checkbox With outcomes',
+        _.assign(base(), {choiceMode: 'radio'}), radioOutcomes, radioInitialResponse);
+
+      set('#two',
+        'A basic checkbox group...',
+        _.assign(base(), {choiceMode: 'checkbox'}), [], []);
+
+      set('#three',
+        'Checkbox With outcomes',
+        _.assign(base(), {choiceMode: 'checkbox'}), cbOutcomes, cbInitialResponse);
+
+      set('#four',
+        'Checkbox With outcomes and correct Response',
+        _.assign(base(), {choiceMode: 'checkbox', correctResponse: correctResponse, disabled: true}), cbOutcomes, cbInitialResponse);
+
+      set('#five',
+        'Style example',
+        _.assign(base(), {choiceMode: 'checkbox', correctResponse: correctResponse}), cbOutcomes, cbInitialResponse);
+
+
+    });
+
+
+  </script>
+</head>
+
+<body>
+<choice-matrix-demo id="zero"></choice-matrix-demo>
+<choice-matrix-demo id="one"></choice-matrix-demo>
+<choice-matrix-demo id="two"></choice-matrix-demo>
+<choice-matrix-demo id="three"></choice-matrix-demo>
+<choice-matrix-demo id="four"></choice-matrix-demo>
+<choice-matrix-demo class="style-example" id="five"></choice-matrix-demo>
+</body>
+
+</html>

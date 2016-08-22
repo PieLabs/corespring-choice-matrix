@@ -1,0 +1,10 @@
+{
+  "name": "corespring-choice-matrix",
+  "version": "1.0.0",
+  "description": "Corespring choice matrix component",
+  "private": true,
+  "main": "index.js",
+  "dependencies": {
+    "polyserve": "^0.12.0"
+  }
+}

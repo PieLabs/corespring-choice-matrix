@@ -1,0 +1,105 @@
+<link rel="import" href="../../polymer/polymer.html"/>
+<link rel="import" href="../../paper-styles/typography.html" />
+<link rel="import" href="../corespring-choice-matrix.html"/>
+<dom-module id="choice-matrix-demo">
+  <template>
+    <style>
+
+      :host {
+        @apply(--paper-font-common-base);
+        background-color: white;
+        display: inline-block;
+        border-radius: 12px;
+        box-shadow: 0px 0px 12px rgba(0,0,0,0.2);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      :host(.style-example){
+        --cs-cm-button-color: red;
+        --cs-cm-text-color: purple;
+        --cs-cm-background-color: lightblue;
+        --cs-cm-button-correct-color: grey;
+        --cs-cm-button-incorrect-color: yellow;
+      }
+
+      td{
+        vertical-align: top;
+      }
+
+      td.comp-cell{
+        width: 400px;
+      }
+      
+      th{
+        text-align: left;
+        border-bottom: solid lightgrey 1px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+    </style>
+
+    <h2>{{title}}</h2>
+    
+    <table>
+      <tr>
+        <th>comp</th>
+        <th>config</th>
+        <th>outcomes</th>
+        <th>response</th>
+      </tr>
+      <tr>
+        <td class="comp-cell">
+          <corespring-choice-matrix
+            class="white-on-black"
+            config="{{config}}"
+            outcomes="{{outcomes}}"
+            response="{{response}}" 
+            on-choice-selected="_onChoiceSelected"
+            on-choice-deselected="_onChoiceDeselected"
+          ></corespring-choice-matrix>
+        </td>
+        <td>
+          <pre>{{_configString}}</pre>
+        </td>
+        <td>
+          <pre>{{_outcomesString}}</pre>
+        </td>
+        <td>
+          <pre>{{_sessionString}}</pre>
+        </td>
+      </tr>
+    </table>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: 'choice-matrix-demo',
+    properties: {
+      styleMode: {type: String},
+      title: {type: String},
+      config: {type: Object, observer: 'onConfigChanged'},
+      outcomes: {type: Object, observer: 'onOutcomesChanged'},
+      response: {type: Array, observer: 'onSessionChanged', notify: true},
+      _configString: {type:String},
+      _sessionString: {type:String}
+    },
+    _onChoiceSelected: function(){
+      this.onSessionChanged(this.response);
+    },
+    _onChoiceDeselected: function(){
+      this.onSessionChanged(this.response);
+    },
+    onOutcomesChanged: function(c){
+      this._outcomesString = JSON.stringify(c, null, ' ');
+    },
+    onConfigChanged: function(c){
+      this._configString = JSON.stringify(c, null, ' ');
+    },
+    onSessionChanged: function(s){
+      this._sessionString = JSON.stringify(s, null, ' ');
+    }
+  });
+</script>
+

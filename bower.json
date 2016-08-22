@@ -1,0 +1,43 @@
+{
+  "name": "corespring-choice-matrix",
+  "description": "corespring choice matrix component",
+  "main": "corespring-choice-matrix.html",
+  "keywords": [
+    "polymer",
+    "custom-element"
+  ],
+  "dependencies": {
+    "polymer": "^1.6.0",
+    "paper-styles": "PolymerElements/paper-styles#^1.1.4",
+    "corespring-show-correct-answer-toggle": "git@github.com:PieLabs/corespring-show-correct-answer-toggle.git",
+    "corespring-choice-button" : "git@github.com:PieLabs/corespring-choice-button.git",
+    "corespring-feedback" : "git@github.com:PieLabs/corespring-feedback.git"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "iron-test-helpers": "PolymerElements/iron-test-helpers#^1.0.0",
+    "test-fixture": "PolymerElements/test-fixture#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "resolutions": {
+    "lodash": "^4.7.0",
+    "polymer": "^1.6.0",
+    "paper-ripple": "^1.0.0",
+    "font-roboto": "^1.0.1",
+    "paper-radio-button": "^1.2.1",
+    "paper-radio-group": "^1.0.0",
+    "webcomponentsjs": "^0.7.20"
+  }
+}

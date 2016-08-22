@@ -1,0 +1,183 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../paper-styles/typography.html"/>
+<link rel="import" href="../corespring-feedback/corespring-feedback.html"/>
+<link rel="import" href="../corespring-show-correct-answer-toggle/corespring-show-correct-answer-toggle.html"/>
+<link rel="import" href="./choice-button.html"/>
+<script src="../lodash/dist/lodash.js"></script>
+<!--
+  A choice matrix component!
+
+  ### Styling
+
+  The following custom properties and mixins are available for styling:
+  
+  Custom property | Description | Default
+  ----------------|-------------|----------
+  --cs-cm-background-color | |
+  --cs-cm-button-correct-color | |
+  --cs-cm-button-incorrect-color | |
+  --cs-cm-text-color | |
+
+  @demo demo/index.html just a plain demo
+-->
+<dom-module is="corespring-choice-matrix">
+  <template>
+    <style>
+      :host {
+        @apply(--paper-font-common-base);
+        background-color: var(--cs-cm-background-color, transparent);
+        display: block;
+        --choice-button-color: var(--cs-cm-button-color, #a2d4f2);
+        --choice-button-correct-color: var(--cs-cm-button-correct-color, --paper-green-500);
+        --choice-button-incorrect-color: var(--cs-cm-button-incorrect-color, --paper-orange-500);
+      }
+
+      .prompt {
+        color: var(--cs-cm-text-color, black);
+        height: 43px;
+        line-height: 43px;
+        vertical-align: middle;
+      }
+
+      td {
+        text-align: center;
+      }
+
+      corespring-show-correct-answer-toggle {
+        margin: 0 auto 0 auto;
+      }
+
+
+    </style>
+    <template is="dom-if" if="{{config.correctResponse}}">
+      <corespring-show-correct-answer-toggle
+        on-toggle="onToggleCorrectAnswer"
+      ></corespring-show-correct-answer-toggle>
+    </template>
+    <template is="dom-if" if="{{config.prompt}}">
+      <div class="prompt">{{config.prompt}}</div>
+    </template>
+    <table>
+      <tr>
+        <th></th>
+        <template is="dom-repeat" items="{{config.columns}}">
+          <th>{{item}}</th>
+        </template>
+      </tr>
+      <template is="dom-repeat" items="{{response}}" as="row" index-as="rowIndex">
+        <tr>
+          <td>{{_labelForRow(rowIndex)}}</td>
+          <template is="dom-repeat" items="{{row.matchSet}}">
+            <td>
+              <corespring-choice-button
+                key="{{item.key}}"
+                value="{{row.id}}:{{index}}"
+                mode="{{config.choiceMode}}"
+                selected="{{item}}"
+                disabled="{{_isDisabled(row.id, index, item)}}"
+                correctness="{{_correctnessFor(row.id, index, item)}}"
+                on-change="_onChoiceChange"
+                label="{{item.label}}">
+              </corespring-choice-button>
+            </td>
+          </template>
+        </tr>
+      </template>
+    </table>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    _stringify: function(d) {
+      return JSON.stringify(d);
+    },
+    is: 'corespring-choice-matrix',
+    properties: {
+      config: {type: Object, value: {}, observer: 'onConfigChange'},
+      response: {type: Array, value: [], observer: 'onResponseChange'},
+      outcomes: {type: Array, value: []}
+    },
+    observers: [
+      '_onChoicesChange(response.*, outcomes)'
+    ],
+    _initResponse: function() {
+      if (this.response && this.config && this.config.rows) {
+        if (_.isEmpty(this.response)) {
+          for (var rowIndex = 0; rowIndex < this.config.rows.length; rowIndex++) {
+            this.push('response', {
+              id: 'row-' + (rowIndex + 1),
+              matchSet: _.times(this.config.columns.length, _.constant(false))
+            });
+          }
+          this.notifyPath('response');
+        }
+      }
+    },
+    onConfigChange: function(c) {
+      this._useCheckboxes = this.config && this.config.choiceMode == 'checkbox';
+      this._initResponse();
+    },
+    onResponseChange: function(c) {
+      console.log('response changed', this.response);
+      this._initResponse();
+    },
+    onToggleCorrectAnswer: function(event, show) {
+      console.log('show: ', show);
+      if (show) {
+        this._userResponse = _.cloneDeep(this.response);
+        this.response = this.config.correctResponse;
+      } else {
+        this.response = this._userResponse;
+      }
+    },
+
+    _onChoiceChange: function(event, choice) {
+      console.log('[onChoiceChange]', event, choice, this._useCheckboxes);
+      var rowAndIndex = choice.value.split(':');
+      var rowIndex = 0, i;
+      for (i = 0; i < this.config.rows.length; i++) {
+        if (this.config.rows[i].id == rowAndIndex[0]) {
+          rowIndex = i;
+        }
+      }
+      var currentRow = _.find(this.response, function(r) {
+        return r.id == rowAndIndex[0];
+      }).matchSet;
+      var responseForRow = _.map(currentRow, function(r, i) {
+        if (this._useCheckboxes) {
+          return (i == rowAndIndex[1]) ? choice.selected : r;
+        } else {
+          return i == rowAndIndex[1] //&& choice.selected;
+        }
+      }.bind(this));
+        this.set('response.' + rowIndex + '.matchSet', []);
+        this.set('response.' + rowIndex + '.matchSet', responseForRow);
+        this.fire(choice.selected ? 'choice-selected' : 'choice-deselected', choice.value);
+    },
+    _onChoicesChange: function(choices, outcomes, response) {
+      console.log("Choices Have Changed");
+    },
+    _labelForRow: function(idx) {
+      return this.config.rows && this.config.rows[idx].label;
+    },
+    _correctnessFor: function(rowId, col, change) {
+      if (_.isUndefined(this.outcomes)) {
+        return;
+      }
+      var responseForRow = (_.find(this.response, function(o) {
+        return o.id == rowId
+      }) || {}).matchSet;
+      if (!responseForRow[col]) {
+        return '';
+      }
+      var outcomesForRow = (_.find(this.outcomes, function(o) {
+        return o.id == rowId
+      }) || {}).correctness;
+      return _.nth(outcomesForRow, col);
+    },
+    _isDisabled: function(rowId, col, change) {
+      return this.config.disabled;
+    }
+  });
+</script>
