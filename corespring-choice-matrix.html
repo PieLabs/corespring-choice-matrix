@@ -74,8 +74,8 @@
                 value="{{row.id}}:{{index}}"
                 mode="{{config.choiceMode}}"
                 selected="{{item}}"
-                disabled="{{_isDisabled(row.id, index, item, config)}}"
-                correctness="{{_correctnessFor(row.id, index, item, config)}}"
+                disabled="{{_isDisabled(row.id, index, item, config, outcomes)}}"
+                correctness="{{_correctnessFor(row.id, index, item, config, outcomes)}}"
                 on-change="_onChoiceChange"
                 label="{{item.label}}">
               </corespring-matrix-button>
@@ -166,7 +166,7 @@
     _labelForRow: function(idx) {
       return this.config.rows && this.config.rows[idx].label;
     },
-    _correctnessFor: function(rowId, col, item, config) {
+    _correctnessFor: function(rowId, col, item, config, outcomes) {
       if (_.isUndefined(this.outcomes)) {
         return;
       }
@@ -184,7 +184,7 @@
       }) || {}).correctness;
       return _.nth(outcomesForRow, col);
     },
-    _isDisabled: function(rowId, col, item, config) {
+    _isDisabled: function(rowId, col, item, config, outcomes) {
       return this.config.disabled;
     }
   });
