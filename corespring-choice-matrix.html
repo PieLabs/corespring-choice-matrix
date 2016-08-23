@@ -2,7 +2,7 @@
 <link rel="import" href="../paper-styles/typography.html"/>
 <link rel="import" href="../corespring-feedback/corespring-feedback.html"/>
 <link rel="import" href="../corespring-show-correct-answer-toggle/corespring-show-correct-answer-toggle.html"/>
-<link rel="import" href="./choice-button.html"/>
+<link rel="import" href="./matrix-button.html"/>
 <script src="../lodash/dist/lodash.js"></script>
 <!--
   A choice matrix component!
@@ -69,16 +69,16 @@
           <td>{{_labelForRow(rowIndex)}}</td>
           <template is="dom-repeat" items="{{row.matchSet}}">
             <td>
-              <corespring-choice-button
+              <corespring-matrix-button
                 key="{{item.key}}"
                 value="{{row.id}}:{{index}}"
                 mode="{{config.choiceMode}}"
                 selected="{{item}}"
-                disabled="{{_isDisabled(row.id, index, item)}}"
-                correctness="{{_correctnessFor(row.id, index, item)}}"
+                disabled="{{_isDisabled(row.id, index, item, config)}}"
+                correctness="{{_correctnessFor(row.id, index, item, config)}}"
                 on-change="_onChoiceChange"
                 label="{{item.label}}">
-              </corespring-choice-button>
+              </corespring-matrix-button>
             </td>
           </template>
         </tr>
@@ -126,9 +126,14 @@
       console.log('show: ', show);
       if (show) {
         this._userResponse = _.cloneDeep(this.response);
-        this.response = this.config.correctResponse;
+        for (var i = 0; i < this.response.length; i++) {
+          this.set('response.'+i+'.matchSet', this.config.correctResponse[i].matchSet);
+        }
       } else {
-        this.response = this._userResponse;
+        for (var i = 0; i < this.response.length; i++) {
+          this.set('response.'+i+'.matchSet', this._userResponse[i].matchSet);
+        }
+        this._userResponse = undefined;
       }
     },
 
@@ -148,7 +153,7 @@
         if (this._useCheckboxes) {
           return (i == rowAndIndex[1]) ? choice.selected : r;
         } else {
-          return i == rowAndIndex[1] //&& choice.selected;
+          return i == rowAndIndex[1] && choice.selected;
         }
       }.bind(this));
         this.set('response.' + rowIndex + '.matchSet', []);
@@ -161,7 +166,7 @@
     _labelForRow: function(idx) {
       return this.config.rows && this.config.rows[idx].label;
     },
-    _correctnessFor: function(rowId, col, change) {
+    _correctnessFor: function(rowId, col, item, config) {
       if (_.isUndefined(this.outcomes)) {
         return;
       }
@@ -171,12 +176,15 @@
       if (!responseForRow[col]) {
         return '';
       }
+      if (this._userResponse) {
+        return 'correct';
+      }
       var outcomesForRow = (_.find(this.outcomes, function(o) {
         return o.id == rowId
       }) || {}).correctness;
       return _.nth(outcomesForRow, col);
     },
-    _isDisabled: function(rowId, col, change) {
+    _isDisabled: function(rowId, col, item, config) {
       return this.config.disabled;
     }
   });

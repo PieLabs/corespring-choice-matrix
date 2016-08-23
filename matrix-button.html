@@ -18,7 +18,7 @@
   @demo demo/index.html
 -->
 
-<dom-module id="corespring-choice-button">
+<dom-module id="corespring-matrix-button">
   <template>
     <style>
       :host {
@@ -73,7 +73,6 @@
       }
     </style>
     <div>
-      <feedback-tick correctness="{{correctness}}"></feedback-tick>
       <template is="dom-if" if="{{_equals('checkbox', mode)}}">
         <paper-checkbox noink value="{{value}}" checked="{{selected}}" on-change="_onChange" class$="{{correctness}}" disabled="{{disabled}}"></paper-checkbox>
       </template>
@@ -85,7 +84,7 @@
 </dom-module>
 <script>
   Polymer({
-    is: "corespring-choice-button",
+    is: "corespring-matrix-button",
     properties: {
       mode: {type:String},
       key: {type:String},
