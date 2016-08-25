@@ -3,21 +3,6 @@
 <link rel="import" href="../paper-checkbox/paper-checkbox.html" />
 <link rel="import" href="../paper-radio-button/paper-radio-button.html" />
 
-<!-- 
-  An element that can be either a checkbox or a radio button, with an optional key and content
-   ### Styling
-  The following custom properties and mixins are available for styling:
-  Custom property | Description | Default
-  ----------------|-------------|----------
-  `--choice-button-color` | the default color of the button | `--paper-indigo-500`
-  `--choice-button-text-color` | the default color of the button text | `--paper-indigo-500`
-  `--choice-button-correct-color` | the correct color of the button | `--paper-indigo-500`
-  `--choice-button-text-correct-color` | the correct color of the button text | `--paper-indigo-500`
-  `--choice-button-incorrect-color` | the incorrect color of the button | `--paper-indigo-500`
-  `--choice-button-text-incorrect-color` | the incorrect color of the button text | `--paper-indigo-500`
-  @demo demo/index.html
--->
-
 <dom-module id="corespring-matrix-button">
   <template>
     <style>
@@ -93,12 +78,6 @@
       correctness: {type:String, observer: '_onCorrectnessChange'},
       disabled:{type:Boolean},
       selected: {type:Boolean},
-      /**
-       * Fired when a button is checked/unchecked.
-       * Sends {value: .., selected: true|false}
-       * @event change
-       *
-       */
     },
     _onCorrectnessChange: function(){
       this.updateStyles();
