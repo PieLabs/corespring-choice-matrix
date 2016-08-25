@@ -39,7 +39,12 @@
         vertical-align: middle;
       }
 
-      td {
+      table {
+        border-spacing: 10px;
+        border-collapse: separate;
+      }
+
+      td, th {
         text-align: center;
       }
 
@@ -64,7 +69,7 @@
           <th>{{item}}</th>
         </template>
       </tr>
-      <template is="dom-repeat" items="{{response}}" as="row" index-as="rowIndex">
+      <template is="dom-repeat" items="{{_visibleResponse}}" as="row" index-as="rowIndex">
         <tr>
           <td>{{_labelForRow(rowIndex, config)}}</td>
           <template is="dom-repeat" items="{{row.matchSet}}">
@@ -109,26 +114,24 @@
           }
           this.notifyPath('response');
         }
+        this._visibleResponse = _.cloneDeep(this.response);
       }
     },
     onConfigChange: function(c) {
       this._useCheckboxes = this.config && this.config.choiceMode == 'checkbox';
       this._initResponse();
+      this._showingCorrectAnswer = false;
     },
     onResponseChange: function(c) {
       this._initResponse();
     },
     onToggleCorrectAnswer: function(event, show) {
       if (show) {
-        this._userResponse = _.cloneDeep(this.response);
-        for (var i = 0; i < this.response.length; i++) {
-          this.set('response.'+i+'.matchSet', this.config.correctResponse[i].matchSet);
-        }
+        this._showingCorrectAnswer = true;
+        this._visibleResponse = _.cloneDeep(this.config.correctResponse);
       } else {
-        for (var i = 0; i < this.response.length; i++) {
-          this.set('response.'+i+'.matchSet', this._userResponse[i].matchSet);
-        }
-        this._userResponse = undefined;
+        this._visibleResponse = _.cloneDeep(this.response);
+        this._showingCorrectAnswer = false;
       }
     },
 
@@ -140,7 +143,7 @@
           rowIndex = i;
         }
       }
-      var currentRow = _.find(this.response, function(r) {
+      var currentRow = _.find(this._visibleResponse, function(r) {
         return r.id == rowAndIndex[0];
       }).matchSet;
       var responseForRow = _.map(currentRow, function(r, i) {
@@ -150,6 +153,7 @@
           return i == rowAndIndex[1] && choice.selected;
         }
       }.bind(this));
+        this.set('_visibleResponse.' + rowIndex + '.matchSet', responseForRow);
         this.set('response.' + rowIndex + '.matchSet', responseForRow);
         this.fire(choice.selected ? 'choice-selected' : 'choice-deselected', choice.value);
     },
@@ -160,13 +164,13 @@
       if (_.isUndefined(this.outcomes)) {
         return;
       }
-      var responseForRow = (_.find(this.response, function(o) {
+      var responseForRow = (_.find(this._visibleResponse, function(o) {
         return o.id == rowId
       }) || {}).matchSet;
       if (!responseForRow[col]) {
         return '';
       }
-      if (this._userResponse) {
+      if (this._showingCorrectAnswer) {
         return 'correct';
       }
       var outcomesForRow = (_.find(this.outcomes, function(o) {

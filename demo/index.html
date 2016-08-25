@@ -49,7 +49,7 @@
       var cbInitialResponse = [
         {
           id: 'row-1',
-          matchSet: [true, true, false]
+          matchSet: [false, true, false]
         },
         {
           id: 'row-2',
@@ -57,7 +57,7 @@
         },
         {
           id: 'row-3',
-          matchSet: [true, false, true]
+          matchSet: [false, false, true]
         }
       ];
 
@@ -109,7 +109,7 @@
 
       set('#four',
         'Checkbox With outcomes and correct Response',
-        _.assign(base(), {choiceMode: 'checkbox', correctResponse: correctResponse, disabled: true}), cbOutcomes, cbInitialResponse);
+        _.assign(base(), {choiceMode: 'checkbox', correctResponse: correctResponse, disabled: false}), cbOutcomes, cbInitialResponse);
 
       set('#five',
         'Style example',
